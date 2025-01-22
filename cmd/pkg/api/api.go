@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/plutack/go-files-api/cmd/internal/client"
+	"github.com/plutack/gofile-api-go-client/cmd/internal/client"
 )
 
 type api struct {

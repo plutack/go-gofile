@@ -1,3 +1,3 @@
-module github.com/plutack/go-files-api
+module github.com/plutack/gofile-api-go-client
 
 go 1.23.5

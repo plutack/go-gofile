@@ -10,8 +10,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/plutack/go-files-api/cmd/core/file"
-	model "github.com/plutack/go-files-api/cmd/models"
+	"github.com/plutack/gofile-api-go-client/cmd/core/file"
+	model "github.com/plutack/gofile-api-go-client/cmd/models"
 )
 
 var baseUrl = "https://api.gofile.io"
