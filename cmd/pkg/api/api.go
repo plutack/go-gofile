@@ -84,5 +84,22 @@ func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, e
 	var body model.AvailableServerResponse
 	json.Unmarshal(buf, &body)
 	return body, nil
+}
 
+// UploadFile to a specified server
+// Returns a structured response or an error.
+func (a *api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
+	resp, err := a.client.UploadFile(server, filePath, folderID)
+	if err != nil {
+		return model.AvailableServerResponse{}, err
+
+	}
+	buf, err := readResponseBody(resp)
+	if err != nil {
+		return model.AvailableServerResponse{}, err
+	}
+
+	var body model.AvailableServerResponse
+	json.Unmarshal(buf, &body)
+	return body, nil
 }

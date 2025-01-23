@@ -73,6 +73,10 @@ func setAuthorizationHeader(r *http.Request, t string) {
 	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t))
 }
 
+func getUploadServerURL(server string) string {
+	return fmt.Sprintf("https://%s.gofile.io/contents/uploadfile", server)
+}
+
 // GetAvailableServers retrieves available servers, optionally filtered by zone
 // If a zone is provided, it's added as a query parameter
 // Returns the HTTP response or an error
@@ -156,15 +160,12 @@ func (c *Client) GetAccountInformation(id string) (*http.Response, error) {
 // If folderID is empty, a new public folder is created automatically.
 // The base URL for the client changes to `https://{server}.gofile.io`
 // Returns the HTTP response or an error
-func (c *Client) UploadFile(filePath string, folderID string) (*http.Response, error) {
-	u, err := url.Parse(c.config.BaseUrl + "/accounts/getid")
-	if err != nil {
-		panic(err)
-	}
+func (c *Client) UploadFile(server string, filePath string, folderID string) (*http.Response, error) {
+	uploadUrl := getUploadServerURL(server)
 	var ct string // gets the content type from upload function
 	pr := file.Upload(filePath, folderID, &ct)
 
-	req, err := http.NewRequest(postMethod, u.String(), pr)
+	req, err := http.NewRequest(postMethod, uploadUrl, pr)
 	if err != nil {
 		return nil, err
 	}

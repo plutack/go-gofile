@@ -7,8 +7,11 @@ import (
 func main() {
 	s := api.New(nil)
 
-	_, err := s.GetAvailableServers("eu")
+	servers, err := s.GetAvailableServers("eu")
+
 	if err != nil {
 		panic(err)
 	}
+
+	servers.Data.Servers[0].Name
 }
