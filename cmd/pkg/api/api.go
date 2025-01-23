@@ -1,37 +1,41 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 
 	"github.com/plutack/gofile-api-go-client/cmd/internal/client"
+	"github.com/plutack/gofile-api-go-client/cmd/model"
 )
 
 type api struct {
 	client *client.Client
 }
 
-func readResponseBody(r *http.Response) (string, error) {
+func readResponseBody(r *http.Response) ([]byte, error) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer r.Body.Close()
 
-	return string(body), nil
+	return body, nil
 }
 
-func (a *api) getAvailableServers(zone string) (string, error) {
+func (a *api) getAvailableServers(zone string) (model.AvailableServerResponse, error) {
 	resp, err := a.client.GetAvailableServers(zone)
 	if err != nil {
-		return "", err
+		return model.AvailableServerResponse{}, err
 
 	}
-	body, err := readResponseBody(resp)
+	buf, err := readResponseBody(resp)
 	if err != nil {
-		return "", err
+		return model.AvailableServerResponse{}, err
 	}
 
+	var body model.AvailableServerResponse
+	json.Unmarshal(buf, &body)
 	return body, nil
 
 }

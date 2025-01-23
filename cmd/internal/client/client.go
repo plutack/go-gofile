@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -11,7 +12,7 @@ import (
 	"time"
 
 	"github.com/plutack/gofile-api-go-client/cmd/core/file"
-	model "github.com/plutack/gofile-api-go-client/cmd/models"
+	"github.com/plutack/gofile-api-go-client/cmd/model"
 )
 
 var baseUrl = "https://api.gofile.io"
@@ -127,15 +128,17 @@ func (c *Client) uploadFile(filePath string, folderId string) (*http.Response, e
 		panic(err)
 	}
 
-	req, err := http.NewRequest(postMethod, u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-	var body bytes.Buffer
-
-	w := multipart.NewWriter(&body)
+	pr, pw := io.Pipe()
+	w := multipart.NewWriter(pw)
 
 	err = file.Upload(w, filePath, folderId)
+	if err != nil {
+		pw.CloseWithError(err)
+		return nil, err
+	}
+	pw.CloseWithError(w.Close())
+
+	req, err := http.NewRequest(postMethod, u.String(), pr)
 	if err != nil {
 		return nil, err
 	}

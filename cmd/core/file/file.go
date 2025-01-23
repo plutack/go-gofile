@@ -8,29 +8,34 @@ import (
 
 func Upload(w *multipart.Writer, filePath string, folderId string) error {
 	var err error
+	errs := make(chan error, 1)
+	go func() {
+		err = w.WriteField("folderId", folderId)
+		if err != nil {
+			errs <- err
+			return
+		}
+		f, err := os.Open(filePath)
+		if err != nil {
+			errs <- err
+			return
+		}
+		defer f.Close()
 
-	f, err := os.Open(filePath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
+		part, err := w.CreateFormFile("file", f.Name())
+		if err != nil {
+			errs <- err
+			return
+		}
+		_, err = io.Copy(part, f)
+		if err != nil {
+			errs <- err
+			return
+		}
 
-	part, err := w.CreateFormFile("file", f.Name())
-	if err != nil {
+	}()
+	if err := <-errs; err != nil {
 		return err
 	}
-	err = w.WriteField("folderId", folderId)
-	if err != nil {
-		return err
-	}
-	_, err = io.Copy(part, f)
-	if err != nil {
-		return err
-	}
-	err = w.Close()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
