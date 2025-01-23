@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -20,9 +21,15 @@ type Options struct {
 	Timeout    *int
 }
 
-func New(opts Options) *api {
+func New(opts *Options) *api {
 	clientConfig := client.NewDefaultClientConfig()
+	if opts == nil {
+		apiClient := client.NewClient(clientConfig)
+		return &api{
+			client: apiClient,
+		}
 
+	}
 	if opts.APIToken != nil {
 		clientConfig.APIToken = *opts.APIToken
 	}
@@ -48,10 +55,11 @@ func readResponseBody(r *http.Response) ([]byte, error) {
 	}
 	defer r.Body.Close()
 
+	fmt.Println(string(body))
 	return body, nil
 }
 
-func (a *api) getAvailableServers(zone string) (model.AvailableServerResponse, error) {
+func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, error) {
 	resp, err := a.client.GetAvailableServers(zone)
 	if err != nil {
 		return model.AvailableServerResponse{}, err
