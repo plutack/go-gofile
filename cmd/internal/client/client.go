@@ -18,10 +18,10 @@ import (
 var baseUrl = "https://api.gofile.io"
 
 type ClientConfig struct {
-	apiToken   string
-	baseUrl    string
-	retryCount int
-	timeout    time.Duration
+	APIToken   string
+	BaseUrl    string
+	RetryCount int
+	Timeout    time.Duration
 }
 type Client struct {
 	httpClient *http.Client
@@ -33,18 +33,18 @@ var postMethod = "POST"
 
 func NewDefaultClientConfig() ClientConfig {
 	return ClientConfig{
-		apiToken:   os.Getenv("gofile_api_key"),
-		baseUrl:    baseUrl,
-		retryCount: 3,
-		timeout:    10 * time.Second,
+		APIToken:   os.Getenv("gofile_api_key"),
+		BaseUrl:    baseUrl,
+		RetryCount: 3,
+		Timeout:    10 * time.Second,
 	}
 }
 
-func newClient(c ClientConfig) *Client {
+func NewClient(c ClientConfig) *Client {
 	return &Client{
 		config: c,
 		httpClient: &http.Client{
-			Timeout: c.timeout,
+			Timeout: c.Timeout,
 		},
 	}
 }
@@ -54,7 +54,7 @@ func setAuthorizationHeader(r *http.Request, t string) {
 }
 
 func (c *Client) GetAvailableServers(zone string) (*http.Response, error) {
-	u, err := url.Parse(c.config.baseUrl + "/servers")
+	u, err := url.Parse(c.config.BaseUrl + "/servers")
 	if err != nil {
 		panic(err)
 	}
@@ -69,12 +69,12 @@ func (c *Client) GetAvailableServers(zone string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	setAuthorizationHeader(req, c.config.apiToken)
+	setAuthorizationHeader(req, c.config.APIToken)
 	return c.httpClient.Do(req)
 }
 
 func (c *Client) createFolder(parentFolderId string, name string) (*http.Response, error) {
-	u, err := url.Parse(c.config.baseUrl + "/contents/createFolder")
+	u, err := url.Parse(c.config.BaseUrl + "/contents/createFolder")
 	if err != nil {
 		panic(err)
 	}
@@ -89,13 +89,13 @@ func (c *Client) createFolder(parentFolderId string, name string) (*http.Respons
 	if err != nil {
 		return nil, err
 	}
-	setAuthorizationHeader(req, c.config.apiToken)
+	setAuthorizationHeader(req, c.config.APIToken)
 	req.Header.Set("Content-Type", "application/json")
 	return c.httpClient.Do(req)
 }
 
 func (c *Client) getAccountId() (*http.Response, error) {
-	u, err := url.Parse(c.config.baseUrl + "/accounts/getid")
+	u, err := url.Parse(c.config.BaseUrl + "/accounts/getid")
 	if err != nil {
 		panic(err)
 	}
@@ -104,12 +104,12 @@ func (c *Client) getAccountId() (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+c.config.apiToken)
+	req.Header.Set("Authorization", "Bearer "+c.config.APIToken)
 	return c.httpClient.Do(req)
 }
 
 func (c *Client) getAccountInformation(id string) (*http.Response, error) {
-	u, err := url.Parse(c.config.baseUrl + fmt.Sprintf("/accounts/%s", id))
+	u, err := url.Parse(c.config.BaseUrl + fmt.Sprintf("/accounts/%s", id))
 	if err != nil {
 		panic(err)
 	}
@@ -118,12 +118,12 @@ func (c *Client) getAccountInformation(id string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	setAuthorizationHeader(req, c.config.apiToken)
+	setAuthorizationHeader(req, c.config.APIToken)
 	return c.httpClient.Do(req)
 }
 
 func (c *Client) uploadFile(filePath string, folderId string) (*http.Response, error) {
-	u, err := url.Parse(c.config.baseUrl + "/accounts/getid")
+	u, err := url.Parse(c.config.BaseUrl + "/accounts/getid")
 	if err != nil {
 		panic(err)
 	}
@@ -142,7 +142,7 @@ func (c *Client) uploadFile(filePath string, folderId string) (*http.Response, e
 	if err != nil {
 		return nil, err
 	}
-	setAuthorizationHeader(req, c.config.apiToken)
+	setAuthorizationHeader(req, c.config.APIToken)
 	req.Header.Set("Content-Type", w.FormDataContentType())
 	return c.httpClient.Do(req)
 	// i still need to change the timeout here
