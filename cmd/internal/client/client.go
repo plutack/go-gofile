@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -163,23 +161,15 @@ func (c *Client) UploadFile(filePath string, folderID string) (*http.Response, e
 	if err != nil {
 		panic(err)
 	}
-
-	pr, pw := io.Pipe()
-	w := multipart.NewWriter(pw)
-
-	err = file.Upload(w, filePath, folderID)
-	if err != nil {
-		pw.CloseWithError(err)
-		return nil, err
-	}
-	pw.CloseWithError(w.Close())
+	var ct string // gets the content type from upload function
+	pr := file.Upload(filePath, folderID, &ct)
 
 	req, err := http.NewRequest(postMethod, u.String(), pr)
 	if err != nil {
 		return nil, err
 	}
 	setAuthorizationHeader(req, c.config.APIToken)
-	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Set("Content-Type", ct)
 	return c.httpClient.Do(req)
 	// i still need to change the timeout here
 }
