@@ -15,12 +15,18 @@ type api struct {
 	client *client.Client
 }
 
+// Options defines optional configuration for the API client.
 type Options struct {
-	APIToken   *string
+	// APIToken is the authentication token for the GoFile.io API
+	APIToken *string
+	// RetryCount specifies the number of times to retry failed API requests
 	RetryCount *int
-	Timeout    *int
+	// Timeout specifies the maximum time to wait for an API Request to be resolved
+	Timeout *int
 }
 
+// New initializes a new API client with optional configuration.
+// If opts is nil, default client settings are used.
 func New(opts *Options) *api {
 	clientConfig := client.NewDefaultClientConfig()
 	if opts == nil {
@@ -48,6 +54,8 @@ func New(opts *Options) *api {
 		client: apiClient,
 	}
 }
+
+// readResponseBody reads and returns the response body as a byte slice.
 func readResponseBody(r *http.Response) ([]byte, error) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -55,10 +63,13 @@ func readResponseBody(r *http.Response) ([]byte, error) {
 	}
 	defer r.Body.Close()
 
+	// Logs the response body for debugging just to pipe to jq
 	fmt.Println(string(body))
 	return body, nil
 }
 
+// GetAvailableServers retrieves available servers, optionally filtered by zone
+// Returns a structured response or an error.
 func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, error) {
 	resp, err := a.client.GetAvailableServers(zone)
 	if err != nil {

@@ -1,3 +1,4 @@
+// Package file contains implementation related to unit file
 package file
 
 import (
@@ -6,6 +7,7 @@ import (
 	"os"
 )
 
+// Upload writes a file to a multipart/form-data
 func Upload(w *multipart.Writer, filePath string, folderId string) error {
 	var err error
 	errs := make(chan error, 1)

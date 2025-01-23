@@ -1,3 +1,4 @@
+// package client contains low level abstractions to wrap around gofile.io api
 package client
 
 import (
@@ -15,22 +16,40 @@ import (
 	"github.com/plutack/gofile-api-go-client/cmd/model"
 )
 
+// baseUrl is the base  URL used for gofile.io api calls
 var baseUrl = "https://api.gofile.io"
 
+// clientConfig contains necessary configuration options to configure a client
 type ClientConfig struct {
-	APIToken   string
-	BaseUrl    string
+	// APIToken is the authentication token for the GoFile.io API
+	APIToken string
+	//BaseUrl is the base url for API request apart from uploadFile API call
+	BaseUrl string
+	// RetryCount specifies the number of times to retry failed API requests
 	RetryCount int
-	Timeout    time.Duration
+	// Timeout specifies the maximum time to wait for an API Request to be resolved
+	Timeout time.Duration
 }
+
+// Client represents an HTTP client for interacting with the GoFile.io API
 type Client struct {
+	// httpClient is the underlying HTTP client used for API requests
 	httpClient *http.Client
-	config     ClientConfig
+	// config holds the configuration settings for the API client
+	config ClientConfig
 }
 
-var getMethod = "GET"
-var postMethod = "POST"
+// HTTP request methods for API interactions
+const (
+	getMethod  = "GET"
+	postMethod = "POST"
+)
 
+// NewDefaultClientConfig creates a default ClientConfig with preset values
+// - API token from environment variable
+// - Default base URL
+// - 3 retry attempts
+// - 10-second timeout
 func NewDefaultClientConfig() ClientConfig {
 	return ClientConfig{
 		APIToken:   os.Getenv("gofile_api_key"),
@@ -40,6 +59,8 @@ func NewDefaultClientConfig() ClientConfig {
 	}
 }
 
+// NewClient creates a new Client with the provided configuration
+// It initializes an HTTP client with the specified timeout
 func NewClient(c ClientConfig) *Client {
 	return &Client{
 		config: c,
@@ -49,10 +70,14 @@ func NewClient(c ClientConfig) *Client {
 	}
 }
 
+// setAuthorizationHeader adds a bearer token to the request's Authorization header
 func setAuthorizationHeader(r *http.Request, t string) {
 	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t))
 }
 
+// GetAvailableServers retrieves available servers, optionally filtered by zone
+// If a zone is provided, it's added as a query parameter
+// Returns the HTTP response or an error
 func (c *Client) GetAvailableServers(zone string) (*http.Response, error) {
 	u, err := url.Parse(c.config.BaseUrl + "/servers")
 	if err != nil {
@@ -73,7 +98,10 @@ func (c *Client) GetAvailableServers(zone string) (*http.Response, error) {
 	return c.httpClient.Do(req)
 }
 
-func (c *Client) createFolder(parentFolderId string, name string) (*http.Response, error) {
+// CreateFolder creates a folder in a folder with the speciifed parentFolderId
+// If name is not specified, a name is auto-generated
+// Returns the HTTP response or an error
+func (c *Client) CreateFolder(parentFolderId string, name string) (*http.Response, error) {
 	u, err := url.Parse(c.config.BaseUrl + "/contents/createFolder")
 	if err != nil {
 		panic(err)
@@ -94,7 +122,9 @@ func (c *Client) createFolder(parentFolderId string, name string) (*http.Respons
 	return c.httpClient.Do(req)
 }
 
-func (c *Client) getAccountId() (*http.Response, error) {
+// GetAccountId  gets the user ID
+// Returns the HTTP response or an error
+func (c *Client) GetAccountId() (*http.Response, error) {
 	u, err := url.Parse(c.config.BaseUrl + "/accounts/getid")
 	if err != nil {
 		panic(err)
@@ -108,7 +138,9 @@ func (c *Client) getAccountId() (*http.Response, error) {
 	return c.httpClient.Do(req)
 }
 
-func (c *Client) getAccountInformation(id string) (*http.Response, error) {
+// GetAccountInformation gets the account information of the specifed user ID
+// Returns the HTTP response or an error
+func (c *Client) GetAccountInformation(id string) (*http.Response, error) {
 	u, err := url.Parse(c.config.BaseUrl + fmt.Sprintf("/accounts/%s", id))
 	if err != nil {
 		panic(err)
@@ -122,7 +154,11 @@ func (c *Client) getAccountInformation(id string) (*http.Response, error) {
 	return c.httpClient.Do(req)
 }
 
-func (c *Client) uploadFile(filePath string, folderId string) (*http.Response, error) {
+// UploadFile uploads a file to a specified folder.
+// If folderID is empty, a new public folder is created automatically.
+// The base URL for the client changes to `https://{server}.gofile.io`
+// Returns the HTTP response or an error
+func (c *Client) UploadFile(filePath string, folderID string) (*http.Response, error) {
 	u, err := url.Parse(c.config.BaseUrl + "/accounts/getid")
 	if err != nil {
 		panic(err)
@@ -131,7 +167,7 @@ func (c *Client) uploadFile(filePath string, folderId string) (*http.Response, e
 	pr, pw := io.Pipe()
 	w := multipart.NewWriter(pw)
 
-	err = file.Upload(w, filePath, folderId)
+	err = file.Upload(w, filePath, folderID)
 	if err != nil {
 		pw.CloseWithError(err)
 		return nil, err
