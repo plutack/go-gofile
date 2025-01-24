@@ -111,3 +111,4 @@ func main() {
 	log.Println("completed")
 }
 ```
+![after running example/main.go](./POC.png)
