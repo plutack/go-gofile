@@ -86,7 +86,50 @@ func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, e
 	return body, nil
 }
 
-// UploadFile to a specified server
+// DeleteContent delete files and folders uploaded or created by user
+// If contentID arguement is not supplied code panics.
+// Returns a structured response or an error.
+func (a *api) DeleteContent(contentID ...string) (model.DeleteContentResponse, error) {
+	resp, err := a.client.DeleteContent(contentID)
+	if err != nil {
+		return model.DeleteContentResponse{}, err
+
+	}
+	buf, err := readResponseBody(resp)
+	if err != nil {
+		return model.DeleteContentResponse{}, err
+	}
+
+	var body model.DeleteContentResponse
+	json.Unmarshal(buf, &body)
+	return body, nil
+}
+
+// UpdateContent changes the attribute of a file or a folder
+// attribute can be any of the following with their expected type for the new value
+// 1. name = string
+// 2. type description = string
+// 3. type tags = []string
+// 4. type public = bool
+// 5. type expiry = string
+// 6. type password = string
+// Returns a structured response or an error.
+func (a *api) UpdateContent(contentID string, attribute string, newAttributeValue interface{}) (model.UpdateContentResponse, error) {
+	resp, err := a.client.UpdateContent(contentID, attribute, newAttributeValue)
+	if err != nil {
+		return model.UpdateContentResponse{}, err
+	}
+	buf, err := readResponseBody(resp)
+	if err != nil {
+		return model.UpdateContentResponse{}, err
+	}
+
+	var body model.UpdateContentResponse
+	json.Unmarshal(buf, &body)
+	return body, nil
+}
+
+// UploadFile saves a file on a specified server
 // Returns a structured response or an error.
 func (a *api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
 	resp, err := a.client.UploadFile(server, filePath, folderID)
@@ -119,3 +162,13 @@ func (a *api) CreateFolder(parentFolderID string, name string) (model.CreateFold
 	json.Unmarshal(buf, &body)
 	return body, nil
 }
+
+// features to be implemented
+// func (a *api) ResetToken() {}
+// premium features to  be implemented
+// func (a *api) CreateDirectLink()       {}
+// func (a *api) UpdateDirectLinkConfig() {}
+// func (a *api) DeleteDirectLink()       {}
+// func (a *api) CopyContent()            {}
+// func (a *api) MoveContent()            {}
+// func (a *api) ImportContent()          {}
