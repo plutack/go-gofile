@@ -11,7 +11,7 @@ import (
 	"github.com/plutack/go-gofile/model"
 )
 
-type api struct {
+type Api struct {
 	client *client.Client
 }
 
@@ -27,11 +27,11 @@ type Options struct {
 
 // New initializes a new API client with optional configuration.
 // If opts is nil, default client settings are used.
-func New(opts *Options) *api {
+func New(opts *Options) *Api {
 	clientConfig := client.NewDefaultClientConfig()
 	if opts == nil {
 		apiClient := client.NewClient(clientConfig)
-		return &api{
+		return &Api{
 			client: apiClient,
 		}
 
@@ -50,7 +50,7 @@ func New(opts *Options) *api {
 
 	apiClient := client.NewClient(clientConfig)
 
-	return &api{
+	return &Api{
 		client: apiClient,
 	}
 }
@@ -70,7 +70,7 @@ func readResponseBody(r *http.Response) ([]byte, error) {
 
 // GetAvailableServers retrieves available servers, optionally filtered by zone
 // Returns a structured response or an error.
-func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, error) {
+func (a *Api) GetAvailableServers(zone string) (model.AvailableServerResponse, error) {
 	resp, err := a.client.GetAvailableServers(zone)
 	if err != nil {
 		return model.AvailableServerResponse{}, err
@@ -89,7 +89,7 @@ func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, e
 // DeleteContent delete files and folders uploaded or created by user
 // If contentID arguement is not supplied code panics.
 // Returns a structured response or an error.
-func (a *api) DeleteContent(contentID ...string) (model.DeleteContentResponse, error) {
+func (a *Api) DeleteContent(contentID ...string) (model.DeleteContentResponse, error) {
 	resp, err := a.client.DeleteContent(contentID)
 	if err != nil {
 		return model.DeleteContentResponse{}, err
@@ -114,7 +114,7 @@ func (a *api) DeleteContent(contentID ...string) (model.DeleteContentResponse, e
 // 5. type expiry = string
 // 6. type password = string
 // Returns a structured response or an error.
-func (a *api) UpdateContent(contentID string, attribute string, newAttributeValue interface{}) (model.UpdateContentResponse, error) {
+func (a *Api) UpdateContent(contentID string, attribute string, newAttributeValue interface{}) (model.UpdateContentResponse, error) {
 	resp, err := a.client.UpdateContent(contentID, attribute, newAttributeValue)
 	if err != nil {
 		return model.UpdateContentResponse{}, err
@@ -131,7 +131,7 @@ func (a *api) UpdateContent(contentID string, attribute string, newAttributeValu
 
 // UploadFile saves a file on a specified server
 // Returns a structured response or an error.
-func (a *api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
+func (a *Api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
 	resp, err := a.client.UploadFile(server, filePath, folderID)
 	if err != nil {
 		return model.UploadFileResponse{}, err
@@ -147,7 +147,7 @@ func (a *api) UploadFile(server string, filePath string, folderID string) (model
 	return body, nil
 }
 
-func (a *api) CreateFolder(parentFolderID string, name string) (model.CreateFolderResponse, error) {
+func (a *Api) CreateFolder(parentFolderID string, name string) (model.CreateFolderResponse, error) {
 	resp, err := a.client.CreateFolder(parentFolderID, name)
 	if err != nil {
 		return model.CreateFolderResponse{}, err
@@ -163,7 +163,7 @@ func (a *api) CreateFolder(parentFolderID string, name string) (model.CreateFold
 	return body, nil
 }
 
-func (a *api) GetAccountId() (model.AccountIDResponse, error) {
+func (a *Api) GetAccountId() (model.AccountIDResponse, error) {
 	resp, err := a.client.GetAccountId()
 	if err != nil {
 		return model.AccountIDResponse{}, err
@@ -179,7 +179,7 @@ func (a *api) GetAccountId() (model.AccountIDResponse, error) {
 	return body, nil
 }
 
-func (a *api) GetAccountInformation(accountId string) (model.AccountInformationResponse, error) {
+func (a *Api) GetAccountInformation(accountId string) (model.AccountInformationResponse, error) {
 	resp, err := a.client.GetAccountInformation(accountId)
 	if err != nil {
 		return model.AccountInformationResponse{}, err
