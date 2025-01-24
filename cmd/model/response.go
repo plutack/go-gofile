@@ -7,14 +7,24 @@ type currentStats struct {
 	Storage     int `json:"storage"`     //
 }
 
-// server represents a server with its name and zone
+// folderInfo represents the information about a folder
+type folderInfo struct {
+	ID           string `json:"id"`           // ID of the folder
+	Owner        string `json:"owner"`        // ID of the creator of the folder
+	Type         string `json:"type"`         // this is always folder
+	Name         string `json:"name"`         // name of the folder
+	ParentFolder string `json:"parentFolder"` // ID of the parent folder
+	CreateTime   string `json:"createTime"`   // date:time the folder was created
+	ModTime      string `json:"modTime"`      //
+	Code         string `json:"code"`         // short code of the folder?
+} // server represents a server with its name and zone
 type server struct {
 	Name string `json:"name"` // name of the server
 	Zone string `json:"zone"` // zone where the server is located
 }
 
-// uploadFileInfo represents information about an uploaded file
-type uploadFileInfo struct {
+// fileInfo represents information about a file
+type fileInfo struct {
 	CreateTime       int      `json:"createTime"`       // time the file was uploaded
 	DownloadPage     string   `json:"downloadPage"`     // gofile.io download link page for the file
 	ID               string   `json:"id"`               // ID of the file on the gofile server
@@ -57,16 +67,23 @@ type AccountInformationResponse struct {
 // AvailableServerResponse represents the response structure for available servers.
 // Contains status and data about servers in all zones.
 type AvailableServerResponse struct {
-	Status string `json:"servers"`
+	Status string `json:"status"`
 	Data   struct {
 		Servers        []server `json:"servers"`        // servers in the specified zone
 		ServersAllZone []server `json:"serversAllZone"` // servers across all zones
 	} `json:"data"`
 }
 
+// CreateFolderResponse represents the response structure for a successful folder creation
+// Contains status and data about the created folder
+type CreateFolderResponse struct {
+	Status string     `json:"status"`
+	Data   folderInfo `json:"data"`
+}
+
 // UploadFileResponse represent the response structure for a successful file upload
 // Contains status and data about uploaded file
 type UploadFileResponse struct {
-	Data   uploadFileInfo `json:"data"`
-	Status string         `json:"status"`
+	Data   fileInfo `json:"data"`
+	Status string   `json:"status"`
 }

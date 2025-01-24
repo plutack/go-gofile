@@ -91,15 +91,31 @@ func (a *api) GetAvailableServers(zone string) (model.AvailableServerResponse, e
 func (a *api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
 	resp, err := a.client.UploadFile(server, filePath, folderID)
 	if err != nil {
-		return model.AvailableServerResponse{}, err
+		return model.UploadFileResponse{}, err
 
 	}
 	buf, err := readResponseBody(resp)
 	if err != nil {
-		return model.AvailableServerResponse{}, err
+		return model.UploadFileResponse{}, err
 	}
 
-	var body model.AvailableServerResponse
+	var body model.UploadFileResponse
+	json.Unmarshal(buf, &body)
+	return body, nil
+}
+
+func (a *api) CreateFolder(parentFolderID string, name string) (model.CreateFolderResponse, error) {
+	resp, err := a.client.CreateFolder(parentFolderID, name)
+	if err != nil {
+		return model.CreateFolderResponse{}, err
+
+	}
+	buf, err := readResponseBody(resp)
+	if err != nil {
+		return model.CreateFolderResponse{}, err
+	}
+
+	var body model.CreateFolderResponse
 	json.Unmarshal(buf, &body)
 	return body, nil
 }

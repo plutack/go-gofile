@@ -103,19 +103,16 @@ func (c *Client) GetAvailableServers(zone string) (*http.Response, error) {
 // CreateFolder creates a folder in a folder with the speciifed parentFolderId
 // If name is not specified, a name is auto-generated
 // Returns the HTTP response or an error
-func (c *Client) CreateFolder(parentFolderId string, name string) (*http.Response, error) {
-	u, err := url.Parse(c.config.BaseUrl + "/contents/createFolder")
-	if err != nil {
-		panic(err)
-	}
+func (c *Client) CreateFolder(parentFolderID string, name string) (*http.Response, error) {
+	u := c.config.BaseUrl + "/contents/createFolder"
 
-	payload := model.NewFolderPayload(parentFolderId, name)
+	payload := model.NewFolderPayload(parentFolderID, name)
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(postMethod, u.String(), bytes.NewBuffer(data))
+	req, err := http.NewRequest(postMethod, u, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
@@ -127,12 +124,9 @@ func (c *Client) CreateFolder(parentFolderId string, name string) (*http.Respons
 // GetAccountId  gets the user ID
 // Returns the HTTP response or an error
 func (c *Client) GetAccountId() (*http.Response, error) {
-	u, err := url.Parse(c.config.BaseUrl + "/accounts/getid")
-	if err != nil {
-		panic(err)
-	}
+	u := c.config.BaseUrl + "/accounts/getid"
 
-	req, err := http.NewRequest(getMethod, u.String(), nil)
+	req, err := http.NewRequest(getMethod, u, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -143,12 +137,9 @@ func (c *Client) GetAccountId() (*http.Response, error) {
 // GetAccountInformation gets the account information of the specifed user ID
 // Returns the HTTP response or an error
 func (c *Client) GetAccountInformation(id string) (*http.Response, error) {
-	u, err := url.Parse(c.config.BaseUrl + fmt.Sprintf("/accounts/%s", id))
-	if err != nil {
-		panic(err)
-	}
+	u := c.config.BaseUrl + fmt.Sprintf("/accounts/%s", id)
 
-	req, err := http.NewRequest(getMethod, u.String(), nil)
+	req, err := http.NewRequest(getMethod, u, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -161,11 +152,11 @@ func (c *Client) GetAccountInformation(id string) (*http.Response, error) {
 // The base URL for the client changes to `https://{server}.gofile.io`
 // Returns the HTTP response or an error
 func (c *Client) UploadFile(server string, filePath string, folderID string) (*http.Response, error) {
-	uploadUrl := getUploadServerURL(server)
+	u := getUploadServerURL(server)
 	var ct string // gets the content type from upload function
 	pr := file.Upload(filePath, folderID, &ct)
 
-	req, err := http.NewRequest(postMethod, uploadUrl, pr)
+	req, err := http.NewRequest(postMethod, u, pr)
 	if err != nil {
 		return nil, err
 	}
