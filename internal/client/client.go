@@ -12,7 +12,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/plutack/gofile-api-go-client/cmd/model"
+	"github.com/plutack/go-gofile/model"
 )
 
 // baseUrl is the base  URL used for gofile.io api calls
@@ -37,7 +37,7 @@ type Client struct {
 const (
 	getMethod  = "GET"
 	postMethod = "POST"
-	putMethod  = "put"
+	putMethod  = "PUT"
 )
 
 // NewDefaultClientConfig creates a default ClientConfig with preset values

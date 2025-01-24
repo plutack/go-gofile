@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/plutack/gofile-api-go-client/cmd/internal/client"
-	"github.com/plutack/gofile-api-go-client/cmd/model"
+	"github.com/plutack/go-gofile/internal/client"
+	"github.com/plutack/go-gofile/model"
 )
 
 type api struct {
@@ -159,6 +159,38 @@ func (a *api) CreateFolder(parentFolderID string, name string) (model.CreateFold
 	}
 
 	var body model.CreateFolderResponse
+	json.Unmarshal(buf, &body)
+	return body, nil
+}
+
+func (a *api) GetAccountId() (model.AccountIDResponse, error) {
+	resp, err := a.client.GetAccountId()
+	if err != nil {
+		return model.AccountIDResponse{}, err
+
+	}
+	buf, err := readResponseBody(resp)
+	if err != nil {
+		return model.AccountIDResponse{}, err
+	}
+
+	var body model.AccountIDResponse
+	json.Unmarshal(buf, &body)
+	return body, nil
+}
+
+func (a *api) GetAccountInformation(accountId string) (model.AccountInformationResponse, error) {
+	resp, err := a.client.GetAccountInformation(accountId)
+	if err != nil {
+		return model.AccountInformationResponse{}, err
+
+	}
+	buf, err := readResponseBody(resp)
+	if err != nil {
+		return model.AccountInformationResponse{}, err
+	}
+
+	var body model.AccountInformationResponse
 	json.Unmarshal(buf, &body)
 	return body, nil
 }
