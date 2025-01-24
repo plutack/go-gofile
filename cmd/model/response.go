@@ -1,13 +1,10 @@
 package model
 
-// AvailableServerResponse represents the response structure for available servers.
-// Contains status and data about servers in all zones.
-type AvailableServerResponse struct {
-	Status string `json:"servers"`
-	Data   struct {
-		Servers        []server `json:"servers"`        // servers in the specified zone
-		ServersAllZone []server `json:"serversAllZone"` // servers across all zones
-	} `json:"data"`
+// currentStats represents information about the user root folder
+type currentStats struct {
+	FolderCount int `json:"folderCount"` // number of folders in user's root folder
+	FileCount   int `json:"fileCount"`   // number of files in user's root folder
+	Storage     int `json:"storage"`     //
 }
 
 // server represents a server with its name and zone
@@ -15,11 +12,8 @@ type server struct {
 	Name string `json:"name"` // name of the server
 	Zone string `json:"zone"` // zone where the server is located
 }
-type UploadFileResponse struct {
-	Data   uploadFileInfo `json:"data"`
-	Status string         `json:"status"`
-}
 
+// uploadFileInfo represents information about an uploaded file
 type uploadFileInfo struct {
 	CreateTime       int      `json:"createTime"`       // time the file was uploaded
 	DownloadPage     string   `json:"downloadPage"`     // gofile.io download link page for the file
@@ -33,4 +27,46 @@ type uploadFileInfo struct {
 	Servers          []string `json:"servers"`          // array of name of servers the uploaded file is on
 	Size             int      `json:"size"`             // size of the file in bytes
 	Type             string   `json:"type"`             // type of file (eg: "file")
+}
+
+// AccountIDResponse represents the response structure for the user's ID
+// Contains status and the user ID
+type AccountIDResponse struct {
+	Status string `json:"status"`
+	Data   struct {
+		ID string `json:"id"` //ID of user account
+	} `json:"data"`
+}
+
+// AccountInformationResponse represent the response structure for a user account information
+// Contains status and data about the user account
+type AccountInformationResponse struct {
+	Status string `json:"status"`
+	Data   struct {
+		IPTraffic30  int          `json:"ipTraffic30"` //
+		ID           string       `json:"id"`          // Id of user account
+		CreateTime   int          `json:"createTime"`  // date:time account was created
+		Email        string       `json:"email"`       // email address of user
+		Tier         string       `json:"tier"`        // tier of user account
+		Token        string       `json:"token"`       // bearer token for Authorization header
+		RootFolder   string       `json:"rootFolder"`  // ID of user's root folder
+		StatsCurrent currentStats `json:"statsCurrent"`
+	} `json:"data"`
+}
+
+// AvailableServerResponse represents the response structure for available servers.
+// Contains status and data about servers in all zones.
+type AvailableServerResponse struct {
+	Status string `json:"servers"`
+	Data   struct {
+		Servers        []server `json:"servers"`        // servers in the specified zone
+		ServersAllZone []server `json:"serversAllZone"` // servers across all zones
+	} `json:"data"`
+}
+
+// UploadFileResponse represent the response structure for a successful file upload
+// Contains status and data about uploaded file
+type UploadFileResponse struct {
+	Data   uploadFileInfo `json:"data"`
+	Status string         `json:"status"`
 }
