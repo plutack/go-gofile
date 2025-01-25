@@ -1,3 +1,4 @@
+// package model defines data structures for the API requests and responses
 package model
 
 import (
@@ -11,6 +12,7 @@ type deleteContent struct {
 }
 
 // newFolder represents the payload for creating a new folder.
+//
 // It contains the ID of the parent folder and the name of the new folder.
 type newFolder struct {
 	ParentFolderId string `json:"parentFolderId"` // ID of parent folder where a folder will be created
@@ -24,6 +26,7 @@ type updateContent struct {
 }
 
 // DeleteContentPayload creates an instance of deleteContent
+//
 // Returns newFolder
 func DeleteContentPayload(IDs []string) deleteContent {
 	if len(IDs) == 0 {
@@ -36,6 +39,7 @@ func DeleteContentPayload(IDs []string) deleteContent {
 }
 
 // NewFolderPayload creates an instance of newFolder
+//
 // Returns newFolder
 func NewFolderPayload(p string, f string) newFolder {
 	return newFolder{
@@ -45,13 +49,21 @@ func NewFolderPayload(p string, f string) newFolder {
 }
 
 // NewUpdateContentPayload creates an instance of updateContent
-// attribute can be any of the following with their expected type for the new value
+//
+// # Attribute can be any of the following with their expected type for the new value
+//
 // 1. name = string
+//
 // 2. type description = string
+//
 // 3. type tags = []string
+//
 // 4. type public = bool
+//
 // 5. type expiry = string
+//
 // 6. type password = string
+//
 // Returns updateContent or an error
 func NewUpdateContentPayload(a string, v interface{}) (updateContent, error) {
 	var marshaledValue []byte

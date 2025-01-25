@@ -1,3 +1,4 @@
+// package api exposes is exposed for user's reuse or dependency sharing
 package api
 
 import (
@@ -17,15 +18,14 @@ type Api struct {
 
 // Options defines optional configuration for the API client.
 type Options struct {
-	// APIToken is the authentication token for the GoFile.io API
-	APIToken *string
-	// RetryCount specifies the number of times to retry failed API requests
-	RetryCount *int
-	// Timeout specifies the maximum time to wait for an API Request to be resolved
-	Timeout *int
+	APIToken   *string // APIToken is the authentication token for the GoFile.io API
+	RetryCount *int    // RetryCount specifies the number of times to retry failed API requests
+	Timeout    *int    // Timeout specifies the maximum time to wait for an API Request to be resolved
+
 }
 
 // New initializes a new API client with optional configuration.
+//
 // If opts is nil, default client settings are used.
 func New(opts *Options) *Api {
 	clientConfig := client.NewDefaultClientConfig()
@@ -69,6 +69,8 @@ func readResponseBody(r *http.Response) ([]byte, error) {
 }
 
 // GetAvailableServers retrieves available servers, optionally filtered by zone
+//
+// zone can either be "eu" or "na"
 // Returns a structured response or an error.
 func (a *Api) GetAvailableServers(zone string) (model.AvailableServerResponse, error) {
 	resp, err := a.client.GetAvailableServers(zone)
@@ -87,7 +89,9 @@ func (a *Api) GetAvailableServers(zone string) (model.AvailableServerResponse, e
 }
 
 // DeleteContent delete files and folders uploaded or created by user
+//
 // If contentID arguement is not supplied code panics.
+//
 // Returns a structured response or an error.
 func (a *Api) DeleteContent(contentID ...string) (model.DeleteContentResponse, error) {
 	resp, err := a.client.DeleteContent(contentID)
@@ -105,14 +109,22 @@ func (a *Api) DeleteContent(contentID ...string) (model.DeleteContentResponse, e
 	return body, nil
 }
 
-// UpdateContent changes the attribute of a file or a folder
-// attribute can be any of the following with their expected type for the new value
+// UpdateContent changes the attribute of a file or a folder.
+//
+// # Attribute can be any of the following with their expected type for the new value
+//
 // 1. name = string
+//
 // 2. type description = string
+//
 // 3. type tags = []string
+//
 // 4. type public = bool
+//
 // 5. type expiry = string
+//
 // 6. type password = string
+//
 // Returns a structured response or an error.
 func (a *Api) UpdateContent(contentID string, attribute string, newAttributeValue interface{}) (model.UpdateContentResponse, error) {
 	resp, err := a.client.UpdateContent(contentID, attribute, newAttributeValue)
@@ -130,6 +142,7 @@ func (a *Api) UpdateContent(contentID string, attribute string, newAttributeValu
 }
 
 // UploadFile saves a file on a specified server
+//
 // Returns a structured response or an error.
 func (a *Api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
 	resp, err := a.client.UploadFile(server, filePath, folderID)
@@ -147,6 +160,11 @@ func (a *Api) UploadFile(server string, filePath string, folderID string) (model
 	return body, nil
 }
 
+// CreateFolder makes a new folder at the root of the specified parent folder id
+//
+//	See model.CreateFolderResponse for struct structure
+//
+// Returns a structured response or an error.
 func (a *Api) CreateFolder(parentFolderID string, name string) (model.CreateFolderResponse, error) {
 	resp, err := a.client.CreateFolder(parentFolderID, name)
 	if err != nil {
@@ -163,7 +181,12 @@ func (a *Api) CreateFolder(parentFolderID string, name string) (model.CreateFold
 	return body, nil
 }
 
-func (a *Api) GetAccountId() (model.AccountIDResponse, error) {
+// GetAccountID returns a struct containing the user account ID.
+//
+//	See model.AccountIDResponse for struct structure
+//
+// Returns a structured response or an error.
+func (a *Api) GetAccountID() (model.AccountIDResponse, error) {
 	resp, err := a.client.GetAccountId()
 	if err != nil {
 		return model.AccountIDResponse{}, err
@@ -179,6 +202,13 @@ func (a *Api) GetAccountId() (model.AccountIDResponse, error) {
 	return body, nil
 }
 
+// GetAccountInformation returns a struct containing the user account information.
+//
+// NOTE: this is where the root folder ID can be gotten from
+//
+//	See model.AccountInformationResponse for struct structure
+//
+// Returns a structured response or an error.
 func (a *Api) GetAccountInformation(accountId string) (model.AccountInformationResponse, error) {
 	resp, err := a.client.GetAccountInformation(accountId)
 	if err != nil {

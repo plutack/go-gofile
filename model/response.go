@@ -21,6 +21,7 @@ type server struct {
 }
 
 // AccountIDResponse represents the response structure for the user's ID
+//
 // Contains status and the user ID
 type AccountIDResponse struct {
 	Status string `json:"status"`
@@ -38,6 +39,7 @@ type DeleteContentResponse struct {
 }
 
 // AccountInformationResponse represent the response structure for a user account information
+//
 // Contains status and data about the user account
 type AccountInformationResponse struct {
 	Status string `json:"status"`
@@ -54,6 +56,7 @@ type AccountInformationResponse struct {
 }
 
 // AvailableServerResponse represents the response structure for available servers.
+//
 // Contains status and data about servers in all zones.
 type AvailableServerResponse struct {
 	Status string `json:"status"`
@@ -64,6 +67,7 @@ type AvailableServerResponse struct {
 }
 
 // CreateFolderResponse represents the response structure for a successful folder creation
+//
 // Contains status and data about the created folder
 type CreateFolderResponse struct {
 	Status string `json:"status"`
@@ -80,6 +84,7 @@ type CreateFolderResponse struct {
 }
 
 // UploadFileResponse represent the response structure for a successful file upload
+//
 // Contains status and data about uploaded file
 type UploadFileResponse struct {
 	Status string `json:"status"`
@@ -100,6 +105,7 @@ type UploadFileResponse struct {
 }
 
 // UpdateContentResponse represent the response structure for a successful attribute change of a file or folder
+//
 // Contains status and data about specified  file or folder
 type UpdateContentResponse struct {
 	Status string `json:"status"`

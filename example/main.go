@@ -53,7 +53,7 @@ func main() {
 	// pick one of the random eu server returned
 	euServer := s.Data.Servers[0].Name //this will be used to upload files
 
-	accIdresp, err := c.GetAccountId() // this has the  account id nested in it
+	accIdresp, err := c.GetAccountID() // this has the  account id nested in it
 	if err != nil {
 		panic(err)
 	}
