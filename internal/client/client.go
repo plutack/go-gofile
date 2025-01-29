@@ -50,7 +50,7 @@ func NewDefaultClientConfig() ClientConfig {
 		APIToken:   os.Getenv("gofile_api_key"),
 		BaseUrl:    baseUrl,
 		RetryCount: 3,
-		Timeout:    10 * time.Second,
+		Timeout:    1 * time.Minute,
 	}
 }
 
@@ -228,13 +228,17 @@ func (c *Client) UploadFile(server string, filePath string, folderID string) (*h
 	u := getUploadServerURL(server)
 	var ct string // gets the content type from upload function
 	pr := upload(filePath, folderID, &ct)
-
+	c.httpClient.Timeout = 0
 	req, err := http.NewRequest(postMethod, u, pr)
 	if err != nil {
 		return nil, err
 	}
 	setAuthorizationHeader(req, c.config.APIToken)
 	req.Header.Set("Content-Type", ct)
-	return c.httpClient.Do(req)
-	// i still need to change the timeout here
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	c.httpClient.Timeout = 1 * time.Minute
+	return response, nil
 }
