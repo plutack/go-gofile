@@ -44,9 +44,9 @@ type DeleteContentResponse struct {
 type AccountInformationResponse struct {
 	Status string `json:"status"`
 	Data   struct {
-		IPTraffic30  int          `json:"ipTraffic30"` //
+		IPTraffic30  int64        `json:"ipTraffic30"` //
 		ID           string       `json:"id"`          // Id of user account
-		CreateTime   int          `json:"createTime"`  // date:time account was created
+		CreateTime   int64        `json:"createTime"`  // date:time account was created
 		Email        string       `json:"email"`       // email address of user
 		Tier         string       `json:"tier"`        // tier of user account
 		Token        string       `json:"token"`       // bearer token for Authorization header
@@ -89,17 +89,17 @@ type CreateFolderResponse struct {
 type UploadFileResponse struct {
 	Status string `json:"status"`
 	Data   struct {
-		CreateTime       int         `json:"createTime"`       // time the file was uploaded
+		CreateTime       int64       `json:"createTime"`       // time the file was uploaded
 		DownloadPage     string      `json:"downloadPage"`     // gofile.io download link page for the file
 		ID               string      `json:"id"`               // ID of the file on the gofile server
 		MD5              string      `json:"md5"`              // MD5 hash of the file
 		Mimetype         string      `json:"mimetype"`         // type of the file (eg: "application/zip")
-		ModTime          int         `json:"modTime"`          //
+		ModTime          int64       `json:"modTime"`          //
 		Name             string      `json:"name"`             // name of the file uploaded
 		ParentFolder     string      `json:"parentFolder"`     // ID of parent folder
 		ParentFolderCode string      `json:"parentFolderCode"` //code of parent folder
 		Servers          []string    `json:"servers"`          // array of name of servers the uploaded file is on
-		Size             int         `json:"size"`             // size of the file in bytes
+		Size             int64       `json:"size"`             // size of the file in bytes
 		Type             ContentType `json:"type"`             // type of file (eg: "file")
 	} `json:"data"`
 }
