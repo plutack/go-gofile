@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/plutack/go-gofile/model"
@@ -200,23 +201,74 @@ func (c *Client) GetAccountInformation(id string) (*http.Response, error) {
 
 // UpdateContent changes the attribute of a file or folder.
 // Returns the HTTP response or an error
-func (c *Client) UpdateContent(contentID string, attribute string, newAttributeValue interface{}) (*http.Response, error) {
+func (c *Client) UpdateContent(contentID string, attribute string, value interface{}) (*http.Response, error) {
 	u := fmt.Sprintf("%s/contents/%s/update", c.config.BaseUrl, contentID)
 
-	payload, err := model.NewUpdateContentPayload(attribute, newAttributeValue)
-	if err != nil {
-		return nil, err
+	payload := model.NewUpdateContentPayload()
+	var err error
+
+	switch attribute {
+	case "name":
+		nameStr, ok := value.(string)
+		if !ok {
+			return nil, fmt.Errorf("name must be string, got %T", value)
+		}
+		err = payload.WithName(nameStr)
+
+	case "description":
+		descStr, ok := value.(string)
+		if !ok {
+			return nil, fmt.Errorf("description must be string, got %T", value)
+		}
+		err = payload.WithDescription(descStr)
+
+	case "tags":
+		slice, ok := value.([]string)
+		if !ok {
+			return nil, fmt.Errorf("description must be string, got %T", value)
+		}
+		tagString := strings.Join(slice, ",")
+		err = payload.WithTags(tagString)
+
+	case "public":
+		pubBool, ok := value.(bool)
+		if !ok {
+			return nil, fmt.Errorf("public must be boolean, got %T", value)
+		}
+		err = payload.WithPublic(pubBool)
+
+	case "expiry":
+		expiryStr, ok := value.(string)
+		if !ok {
+			return nil, fmt.Errorf("expiry must be string in RFC3339 format, got %T", value)
+		}
+		err = payload.WithExpiry(expiryStr)
+
+	case "password":
+		passStr, ok := value.(string)
+		if !ok {
+			return nil, fmt.Errorf("password must be string, got %T", value)
+		}
+		err = payload.WithPassword(passStr)
+
+	default:
+		return nil, fmt.Errorf("unsupported attribute: %s", attribute)
 	}
-	data, err := json.Marshal(payload)
+
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to set attribute %s: %w", attribute, err)
 	}
-	req, err := http.NewRequest(putMethod, u, bytes.NewBuffer(data))
+
+	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("marshal payload failed: %w", err)
 	}
-	setAuthorizationHeader(req, c.config.APIToken)
+	req, err := http.NewRequest(http.MethodPut, u, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, fmt.Errorf("create request failed: %w", err)
+	}
 	req.Header.Set("Content-Type", "application/json")
+	setAuthorizationHeader(req, c.config.APIToken)
 	return c.httpClient.Do(req)
 }
 
