@@ -113,12 +113,12 @@ func DeleteContentPayload(IDs []string) deleteContent {
 // NewFolderPayload creates an instance of newFolder
 //
 // Returns newFolder
-// func NewFolderPayload(p string, f string) newFolder {
-// 	return newFolder{
-// 		ParentFolderId: p,
-// 		FolderName:     f,
-// 	}
-// }
+func NewFolderPayload(p string, f string) newFolder {
+	return newFolder{
+		ParentFolderId: p,
+		FolderName:     f,
+	}
+}
 
 // NewUpdateContentPayload creates an instance of updateContent
 //
