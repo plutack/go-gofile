@@ -126,7 +126,7 @@ func (a *Api) DeleteContent(contentID ...string) (model.DeleteContentResponse, e
 // 6. type password = string
 //
 // Returns a structured response or an error.
-func (a *Api) UpdateContent(contentID string, attribute string, newAttributeValue interface{}) (model.UpdateContentResponse, error) {
+func (a *Api) UpdateContent(contentID string, attribute string, newAttributeValue any) (model.UpdateContentResponse, error) {
 	resp, err := a.client.UpdateContent(contentID, attribute, newAttributeValue)
 	if err != nil {
 		return model.UpdateContentResponse{}, err

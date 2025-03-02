@@ -99,7 +99,7 @@ func (u *updateContent) WithPassword(p string) error {
 
 // DeleteContentPayload creates an instance of deleteContent
 //
-// Returns newFolder
+// Returns delete content
 func DeleteContentPayload(IDs []string) deleteContent {
 	if len(IDs) == 0 {
 		panic("at least one ID must be provided")

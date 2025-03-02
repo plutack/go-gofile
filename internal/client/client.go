@@ -36,9 +36,10 @@ type Client struct {
 
 // HTTP request methods for API interactions
 const (
-	getMethod  = "GET"
-	postMethod = "POST"
-	putMethod  = "PUT"
+	getMethod    = "GET"
+	postMethod   = "POST"
+	putMethod    = "PUT"
+	deleteMethod = "DELETE"
 )
 
 // NewDefaultClientConfig creates a default ClientConfig with preset values
@@ -156,7 +157,7 @@ func (c *Client) CreateFolder(parentFolderID string, name string) (*http.Respons
 // DeleteContent deletes files and folder  the speciifed contentID(s)
 // Returns the HTTP response or an error
 func (c *Client) DeleteContent(IDs []string) (*http.Response, error) {
-	u := c.config.BaseUrl + "/contents/createFolder"
+	u := c.config.BaseUrl + "/contents"
 
 	payload := model.DeleteContentPayload(IDs)
 	data, err := json.Marshal(payload)
@@ -164,7 +165,7 @@ func (c *Client) DeleteContent(IDs []string) (*http.Response, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(postMethod, u, bytes.NewBuffer(data))
+	req, err := http.NewRequest(deleteMethod, u, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}

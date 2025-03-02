@@ -19,10 +19,6 @@ import (
 // 6. delete `testfile2`
 // 7. rename `test folder` to `test folder renamed`
 
-const (
-	location = "/home/plutack/.cache/"
-)
-
 // CreateTextFile creates a text file at the specified location with the given name and content.
 func CreateTextFile(filename, content, location string) error {
 	fullPath := filepath.Join(location, filename)
@@ -45,6 +41,11 @@ func CreateTextFile(filename, content, location string) error {
 }
 
 func main() {
+	location, err := os.UserHomeDir()
+
+	if err != nil {
+		panic(err)
+	}
 	c := api.New(nil)
 	s, err := c.GetAvailableServers("eu")
 	if err != nil {
