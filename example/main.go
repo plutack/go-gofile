@@ -40,6 +40,11 @@ func CreateTextFile(filename, content, location string) error {
 	return nil
 }
 
+func progressCallbackfunc(done int64, total int64) {
+	percentageCompleted := float64(done) / float64(total) * 100
+	fmt.Printf("%.2f%% completed\n", percentageCompleted)
+}
+
 func main() {
 	location, err := os.UserHomeDir()
 
@@ -76,12 +81,12 @@ func main() {
 	CreateTextFile("testfile1", "hello world", location)
 	CreateTextFile("testfile2", "hello world again", location)
 
-	uploadFileResp1, err := c.UploadFile(euServer, location+"testfile1", rootFolderId)
+	uploadFileResp1, err := c.UploadFile(euServer, filepath.Join(location, "testfile1"), rootFolderId, progressCallbackfunc)
 	if err != nil {
 		panic(err)
 	}
 	log.Printf("--------------\ntest folder 1 info\nname: %s\nID: %s\n--------------\n", uploadFileResp1.Data.Name, uploadFileResp1.Data.ID)
-	uploadFileResp2, err := c.UploadFile(euServer, location+"testfile2", rootFolderId)
+	uploadFileResp2, err := c.UploadFile(euServer, filepath.Join(location, "testfile2"), rootFolderId, progressCallbackfunc)
 	if err != nil {
 		panic(err)
 	}

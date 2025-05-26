@@ -16,6 +16,14 @@ import (
 	"github.com/plutack/go-gofile/model"
 )
 
+// HTTP request methods for API interactions
+const (
+	getMethod    = "GET"
+	postMethod   = "POST"
+	putMethod    = "PUT"
+	deleteMethod = "DELETE"
+)
+
 // baseUrl is the base  URL used for gofile.io api calls
 var baseUrl = "https://api.gofile.io"
 
@@ -25,8 +33,11 @@ type ClientConfig struct {
 	BaseUrl    string        //BaseUrl is the base url for API request apart from uploadFile API call
 	RetryCount int           // RetryCount specifies the number of times to retry failed API requests
 	Timeout    time.Duration // Timeout specifies the maximum time to wait for an API Request to be resolved
-
 }
+
+// ProgressCallback represents a function that receives progress updates.
+// done is the number of bytes uploaded so far, and total is the total number of bytes.
+type ProgressCallback = func(done int64, total int64)
 
 // Client represents an HTTP client for interacting with the GoFile.io API
 type Client struct {
@@ -34,13 +45,31 @@ type Client struct {
 	config     ClientConfig // config holds the configuration settings for the API client
 }
 
-// HTTP request methods for API interactions
-const (
-	getMethod    = "GET"
-	postMethod   = "POST"
-	putMethod    = "PUT"
-	deleteMethod = "DELETE"
-)
+// progressReader wraps an io.Reader and reports progress as bytes are read.
+// It tracks the total number of bytes read so far and invokes the onRead callback
+// with the current progress and total size.
+type progressReader struct {
+	io.Reader
+	total  int64
+	size   int64
+	onRead func(total int64, size int64)
+}
+
+// Read is a custom implementation that wraps the underlying reader's Read method
+// and invokes the onRead callback to report progress as data is read.
+func (p *progressReader) Read(buf []byte) (int, error) {
+	n, err := p.Reader.Read(buf)
+	if n > 0 {
+		p.total += int64(n)
+		p.onRead(p.total, p.size)
+	}
+	return n, err
+}
+
+// Returns the ratio of the tile that has been read in percentages
+func (p *progressReader) PercentageCompleted() float64 {
+	return (float64(p.total) / float64(p.size)) * 100
+}
 
 // NewDefaultClientConfig creates a default ClientConfig with preset values
 // - API token from environment variable
@@ -78,7 +107,7 @@ func getUploadServerURL(server string) string {
 
 // Upload creates a multipart/form-data request body for uploading a file.
 // Returns a PipeReader that streams the data.
-func upload(filePath string, folderId string, contentType *string) *io.PipeReader {
+func upload(filePath string, folderId string, contentType *string, onProgress ProgressCallback) *io.PipeReader {
 	pr, pw := io.Pipe()
 	w := multipart.NewWriter(pw)
 	go func() {
@@ -93,13 +122,23 @@ func upload(filePath string, folderId string, contentType *string) *io.PipeReade
 			return
 		}
 		defer f.Close()
-
-		part, err := w.CreateFormFile("file", f.Name())
+		fi, err := f.Stat()
+		progressR := &progressReader{
+			Reader: f,
+			size:   fi.Size(),
+			total:  0,
+			onRead: onProgress,
+		}
 		if err != nil {
 			pw.CloseWithError(err)
 			return
 		}
-		_, err = io.Copy(part, f)
+		part, err := w.CreateFormFile("file", fi.Name())
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+		_, err = io.Copy(part, progressR)
 		if err != nil {
 			pw.CloseWithError(err)
 			return
@@ -277,10 +316,10 @@ func (c *Client) UpdateContent(contentID string, attribute string, value interfa
 // If folderID is empty, a new public folder is created automatically.
 // The base URL for the client changes to `https://{server}.gofile.io`
 // Returns the HTTP response or an error
-func (c *Client) UploadFile(server string, filePath string, folderID string) (*http.Response, error) {
+func (c *Client) UploadFile(server string, filePath string, folderID string, callbackUpdate ProgressCallback) (*http.Response, error) {
 	u := getUploadServerURL(server)
 	var ct string // gets the content type from upload function
-	pr := upload(filePath, folderID, &ct)
+	pr := upload(filePath, folderID, &ct, callbackUpdate)
 	c.httpClient.Timeout = 0
 	req, err := http.NewRequest(postMethod, u, pr)
 	if err != nil {
