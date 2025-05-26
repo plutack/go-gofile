@@ -144,8 +144,8 @@ func (a *Api) UpdateContent(contentID string, attribute string, newAttributeValu
 // UploadFile saves a file on a specified server
 //
 // Returns a structured response or an error.
-func (a *Api) UploadFile(server string, filePath string, folderID string) (model.UploadFileResponse, error) {
-	resp, err := a.client.UploadFile(server, filePath, folderID)
+func (a *Api) UploadFile(server string, filePath string, folderID string, callbackUpdate client.ProgressCallback) (model.UploadFileResponse, error) {
+	resp, err := a.client.UploadFile(server, filePath, folderID, callbackUpdate)
 	if err != nil {
 		return model.UploadFileResponse{}, err
 
